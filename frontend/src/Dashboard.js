@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import axios from "axios";
 import Roles from "./Roles";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 
