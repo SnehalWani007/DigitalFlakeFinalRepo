@@ -1,32 +1,65 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import axios from "axios";
+import Roles from "./Roles";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 const Dashboard = ({ onLogout }) => {
-  const [activePage, setActivePage] = useState('home');
-  const [showConfirmLogout, setShowConfirmLogout] = useState(false); // State for the confirmation dialog
+  const [activePage, setActivePage] = useState("home");
+  const [showConfirmLogout, setShowConfirmLogout] = useState(false);
+  const [roles, setRoles] = useState([]);
+
+  const fetchRoles = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/roles");
+      setRoles(response.data);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (activePage === "roles") {
+      fetchRoles();
+    }
+  }, [activePage]);
+
+  const handleNavClick = (page) => {
+    setActivePage(page);
+  };
 
   const renderContent = () => {
     switch (activePage) {
-      case 'home':
+      case "home":
         return <Content>Welcome To Digital Flake</Content>;
-      case 'users':
+      case "users":
         return <Content>List of Users</Content>;
+      case "roles":
+        return (
+          <Router>
+            <Content>
+              <Routes>
+                <Route path="/roles" element={<Roles />} />
+              </Routes>
+            </Content>
+          </Router>
+        );
       default:
         return null;
     }
   };
 
   const handleLogoutClick = () => {
-    setShowConfirmLogout(true); // Show confirmation dialog
+    setShowConfirmLogout(true);
   };
 
   const confirmLogout = () => {
-    onLogout(); // Call the logout function
-    setShowConfirmLogout(false); // Hide the confirmation dialog
+    onLogout();
+    setShowConfirmLogout(false);
   };
 
   const cancelLogout = () => {
-    setShowConfirmLogout(false); // Hide the confirmation dialog
+    setShowConfirmLogout(false);
   };
 
   return (
@@ -36,9 +69,15 @@ const Dashboard = ({ onLogout }) => {
       </Header>
       <Main>
         <Sidebar>
-          <NavItem onClick={() => setActivePage('home')}>Home</NavItem>
-          <NavItem onClick={() => setActivePage('users')}>Users</NavItem>
-          <NavItem onClick={() => setActivePage('roles')}>Roles</NavItem>
+          <NavItem active={activePage === "home"} onClick={() => handleNavClick("home")}>
+            Home ➔
+          </NavItem>
+          <NavItem active={activePage === "users"} onClick={() => handleNavClick("users")}>
+            Users ➔
+          </NavItem>
+          <NavItem active={activePage === "roles"} onClick={() => handleNavClick("roles")}>
+            Roles ➔
+          </NavItem>
         </Sidebar>
         <ContentArea>{renderContent()}</ContentArea>
         <LogoutButton onClick={handleLogoutClick}>Logout</LogoutButton>
@@ -94,8 +133,15 @@ const Sidebar = styled.div`
 const NavItem = styled.div`
   margin: 10px 0;
   cursor: pointer;
+  padding: 10px;
+  background-color: ${(props) => (props.active ? "yellow" : "transparent")}; /* Yellow background if active */
+  color: ${(props) => (props.active ? "black" : "black")}; /* Text color */
+  border-radius: 5px; /* Rounded corners */
+  display: flex;
+  align-items: center;
+
   &:hover {
-    color: purple;
+    background-color: lightgray; /* Change to light gray on hover */
   }
 `;
 
@@ -161,4 +207,4 @@ const CancelButton = styled.button`
   cursor: pointer;
 `;
 
-export default Dashboard;
+export default Dashboard; // Ensure this line is present

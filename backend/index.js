@@ -133,6 +133,48 @@ app.post('/reset-password', [
   });
 });
 
+// Roles
+
+// Fetch Roles
+app.get('/roles', (req, res) => {
+  const query = `SELECT * FROM roles`;
+  db.query(query, (error, results) => {
+    if (error) throw error;
+    res.json(results);
+  });
+});
+
+// Create Role
+app.post('/roles', (req, res) => {
+  const { role_name, status } = req.body;
+  const query = `INSERT INTO roles (role_name, status) VALUES (?, ?)`;
+  db.query(query, [role_name, status], (error) => {
+    if (error) throw error;
+    res.send('Role added successfully');
+  });
+});
+
+// Update Role
+app.put('/roles/:id', (req, res) => {
+  const { id } = req.params;
+  const { role_name, status } = req.body;
+  const query = `UPDATE roles SET role_name = ?, status = ? WHERE id = ?`;
+  db.query(query, [role_name, status, id], (error) => {
+    if (error) throw error;
+    res.send('Role updated successfully');
+  });
+});
+
+// Delete Role
+app.delete('/roles/:id', (req, res) => {
+  const { id } = req.params;
+  const query = `DELETE FROM roles WHERE id = ?`;
+  db.query(query, [id], (error) => {
+    if (error) throw error;
+    res.send('Role deleted successfully');
+  });
+});
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
